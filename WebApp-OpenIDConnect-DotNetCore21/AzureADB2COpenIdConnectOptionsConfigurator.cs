@@ -1,10 +1,10 @@
-﻿using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebApp_OpenIDConnect_DotNetCore21
 {
@@ -19,8 +19,8 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
         public void Configure(string name, OpenIdConnectOptions options)
         {
-            options.Events.OnAuthorizationCodeReceived = WrapOpenIdConnectEvent(options.Events.OnAuthorizationCodeReceived, OnAuthorizationCodeReceived);
-            options.Events.OnRedirectToIdentityProvider = WrapOpenIdConnectEvent(options.Events.OnRedirectToIdentityProvider, OnRedirectToIdentityProvider);
+            options.Events.OnAuthorizationCodeReceived = WrapOpenIdConnectEvent(options.Events.OnAuthorizationCodeReceived, OnAuthorizationCodeReceivedAsync);
+            options.Events.OnRedirectToIdentityProvider = WrapOpenIdConnectEvent(options.Events.OnRedirectToIdentityProvider, OnRedirectToIdentityProviderAsync);
         }
 
         public void Configure(OpenIdConnectOptions options)
@@ -37,15 +37,16 @@ namespace WebApp_OpenIDConnect_DotNetCore21
             });
         }
 
-        private async Task OnAuthorizationCodeReceived(AuthorizationCodeReceivedContext context)
+        private async Task OnAuthorizationCodeReceivedAsync(AuthorizationCodeReceivedContext context)
         {
             var clientCredential = new ClientCredential(context.Options.ClientSecret);
             var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
             var tokenCache = new SessionTokenCache(context.HttpContext, userId);
-
+            var referers = context.HttpContext.Request.Headers["Referer"].ToString().Split('/')[4].ToLower();
+            var authority = context.Options.Authority.Replace("b2c_1_susi", referers);
             var confidentialClientApplication = new ConfidentialClientApplication(
                 context.Options.ClientId,
-                context.Options.Authority,
+                authority,
                 _options.RedirectUri,
                 clientCredential,
                 tokenCache.GetInstance(),
@@ -59,11 +60,11 @@ namespace WebApp_OpenIDConnect_DotNetCore21
             catch (Exception ex)
             {
                 // TODO: Handle
-                throw;
+                throw ex;
             }
         }
 
-        private Task OnRedirectToIdentityProvider(RedirectContext context)
+        private Task OnRedirectToIdentityProviderAsync(RedirectContext context)
         {
             context.ProtocolMessage.ResponseType = OpenIdConnectResponseType.CodeIdToken;
             context.ProtocolMessage.Scope += $" offline_access {_options.ApiScopes}";

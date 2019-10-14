@@ -1,12 +1,12 @@
-﻿using System.Threading;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Client;
+using System.Threading;
 
 namespace WebApp_OpenIDConnect_DotNetCore21
 {
     public class SessionTokenCache
     {
-        private static ReaderWriterLockSlim TokenCacheLock;
+        private static ReaderWriterLockSlim _tokenCacheLock;
 
         private readonly HttpContext _context;
         private readonly string _sessionKey;
@@ -15,7 +15,7 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
         static SessionTokenCache()
         {
-            TokenCacheLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+            _tokenCacheLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
         }
 
         public SessionTokenCache(HttpContext context, string userId)
@@ -36,17 +36,17 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
         public void Load()
         {
-            TokenCacheLock.EnterReadLock();
+            _tokenCacheLock.EnterReadLock();
             _tokenCache.Deserialize(_context.Session.Get(_sessionKey));
-            TokenCacheLock.ExitReadLock();
+            _tokenCacheLock.ExitReadLock();
         }
 
         public void Save()
         {
-            TokenCacheLock.EnterWriteLock();
+            _tokenCacheLock.EnterWriteLock();
             _tokenCache.HasStateChanged = false;
             _context.Session.Set(_sessionKey, _tokenCache.Serialize());
-            TokenCacheLock.ExitWriteLock();
+            _tokenCacheLock.ExitWriteLock();
         }
 
         private void OnAfterAccess(TokenCacheNotificationArgs args)
