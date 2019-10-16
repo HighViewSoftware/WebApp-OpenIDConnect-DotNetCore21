@@ -1,3 +1,15 @@
-﻿@using WebApp_OpenIDConnect_DotNetCore21
+@using Microsoft.AspNetCore.Identity
+@using WebApp_OpenIDConnect_DotNetCore21
 @using WebApp_OpenIDConnect_DotNetCore21.Models
+@using Aiursoft.Pylon
+@using Aiursoft.Pylon.Models
+@using Aiursoft.Pylon.Services;
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@*@inject SignInManager<ColossusUser> SignInManager
+    @inject UserManager<ColossusUser> UserManager*@
+@inject ServiceLocation ServiceLocation
+@inject IViewLocalizer Localizer
+@*@inject UserImageGenerator<ColossusUser> UserImageGenerator*@
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, Aiursoft.Pylon

@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Aiursoft.Pylon;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureADB2C.UI;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
+using WebApp_OpenIDConnect_DotNetCore21.Data;
 
 namespace WebApp_OpenIDConnect_DotNetCore21
 {
@@ -25,6 +27,13 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<ColossusDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DatabaseConnection")));
+
+            //services.AddIdentity<ColossusUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ColossusDbContext>()
+            //    .AddDefaultTokenProviders();
+
             services.AddSingleton<HttpClient>();
             services.Configure<AzureADB2CWithApiOptions>(options => Configuration.Bind("AzureADB2C", options));
 
@@ -39,11 +48,10 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
             services.AddSingleton<IConfigureOptions<OpenIdConnectOptions>, AzureADB2COpenIdConnectOptionsConfigurator>();
 
-            services.AddControllersWithViews()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddAiurMvc();
 
             services.AddDistributedMemoryCache();
-
+            services.AddAiurDependencies("Colossus");
             services.AddSession(options =>
             {
                 options.Cookie.HttpOnly = true;
@@ -64,6 +72,7 @@ namespace WebApp_OpenIDConnect_DotNetCore21
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
+            app.UseAiursoftSupportedCultures();
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
