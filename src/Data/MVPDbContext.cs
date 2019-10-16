@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using BopodaMVP.Models;
+﻿using BopodaMVP.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BopodaMVP.Data
 {

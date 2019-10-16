@@ -31,7 +31,7 @@
 <script>
     window.addEventListener('load', function () {
         var updateButtons = function () {
-            var value = $(".index-form [name=file]").attr('data-internet-path').replace('aiursoft.io', 'bopoda.xyz');
+            var value = $(".index-form [name=file]").attr('data-internet-path');
             if (value && value.length > 0) {
                 $('#openButton').show();
                 $('#copyButton').show();
