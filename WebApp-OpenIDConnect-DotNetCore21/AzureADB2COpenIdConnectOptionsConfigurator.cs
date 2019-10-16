@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -40,7 +41,7 @@ namespace WebApp_OpenIDConnect_DotNetCore21
         private async Task OnAuthorizationCodeReceivedAsync(AuthorizationCodeReceivedContext context)
         {
             var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var referers = context.HttpContext.Request.Headers["Referer"].ToString().Split('/')[4].ToLower();
+            var referers = context.HttpContext.Request.Headers["Referer"].ToString().Split('/').FirstOrDefault(t => t.ToLower().StartsWith("b2c_1")).ToLower();
             var authority = context.Options.Authority.Replace("b2c_1_susi", referers);
 
             var confidentialClientApplication = ConfidentialClientApplicationBuilder
@@ -61,7 +62,7 @@ namespace WebApp_OpenIDConnect_DotNetCore21
             catch (Exception ex)
             {
                 // TODO: Handle
-                throw ex;
+                //throw ex;
             }
         }
 
