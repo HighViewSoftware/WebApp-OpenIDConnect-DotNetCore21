@@ -39,22 +39,23 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
         private async Task OnAuthorizationCodeReceivedAsync(AuthorizationCodeReceivedContext context)
         {
-            var clientCredential = new ClientCredential(context.Options.ClientSecret);
             var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var tokenCache = new SessionTokenCache(context.HttpContext, userId);
             var referers = context.HttpContext.Request.Headers["Referer"].ToString().Split('/')[4].ToLower();
             var authority = context.Options.Authority.Replace("b2c_1_susi", referers);
-            var confidentialClientApplication = new ConfidentialClientApplication(
-                context.Options.ClientId,
-                authority,
-                _options.RedirectUri,
-                clientCredential,
-                tokenCache.GetInstance(),
-                null);
+
+            var confidentialClientApplication = ConfidentialClientApplicationBuilder
+                .Create(context.Options.ClientId)
+                .WithClientSecret(context.Options.ClientSecret)
+                .WithAuthority(authority)
+                .WithRedirectUri(_options.RedirectUri)
+                .Build();
 
             try
             {
-                var authenticationResult = await confidentialClientApplication.AcquireTokenByAuthorizationCodeAsync(context.ProtocolMessage.Code, _options.ApiScopes.Split(' '));
+                var authenticationResult = await confidentialClientApplication
+                    .AcquireTokenByAuthorizationCode(_options.ApiScopes.Split(' '), context.ProtocolMessage.Code)
+                    .WithB2CAuthority(authority)
+                    .ExecuteAsync();
                 context.HandleCodeRedemption(authenticationResult.AccessToken, authenticationResult.IdToken);
             }
             catch (Exception ex)

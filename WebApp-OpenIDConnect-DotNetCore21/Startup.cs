@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
@@ -38,8 +39,8 @@ namespace WebApp_OpenIDConnect_DotNetCore21
 
             services.AddSingleton<IConfigureOptions<OpenIdConnectOptions>, AzureADB2COpenIdConnectOptionsConfigurator>();
 
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddControllersWithViews()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddDistributedMemoryCache();
 
@@ -51,24 +52,25 @@ namespace WebApp_OpenIDConnect_DotNetCore21
             });
         }
 
-        public void Configure(IApplicationBuilder applicationBuilder, IHostingEnvironment hostingEnvironment)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (hostingEnvironment.IsDevelopment())
+            if (env.IsDevelopment())
             {
-                applicationBuilder.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
             }
             else
             {
-                applicationBuilder.UseExceptionHandler("/Home/Error");
-                applicationBuilder.UseHsts();
-                applicationBuilder.UseHttpsRedirection();
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+                app.UseHttpsRedirection();
             }
-
-            applicationBuilder.UseStaticFiles();
-            applicationBuilder.UseCookiePolicy();
-            applicationBuilder.UseSession();
-            applicationBuilder.UseAuthentication();
-            applicationBuilder.UseMvcWithDefaultRoute();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+            app.UseSession();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseRouting();
+            app.UseEndpoints(t => t.MapDefaultControllerRoute());
         }
     }
 }
