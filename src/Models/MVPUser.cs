@@ -1,28 +1,34 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BopodaMVP.Models
 {
-    // Add profile data for application users by adding properties to the ApplicationUser class
     public class MVPUser
     {
         public string Id { get; set; }
         public string SiteName { get; set; }
         public string Name { get; internal set; }
+
+        [InverseProperty(nameof(OrganizationUserRelationship.User))]
+        public IEnumerable<OrganizationUserRelationship> Organizations { get; set; }
     }
 
-    public class Tenant
+    public class Organization
     {
         public int Id { get; set; }
         public string Name { get; set; }
+
+        [InverseProperty(nameof(OrganizationUserRelationship.Organization))]
+        public IEnumerable<OrganizationUserRelationship> Users { get; set; }
     }
 
-    public class TenantUserRelationship
+    public class OrganizationUserRelationship
     {
         public int Id { get; set; }
 
-        public int TenantId { get; set; }
-        [ForeignKey(nameof(TenantId))]
-        public Tenant Tenant { get; set; }
+        public int OrganizationId { get; set; }
+        [ForeignKey(nameof(OrganizationId))]
+        public Organization Organization { get; set; }
 
         public string UserId { get; set; }
         [ForeignKey(nameof(UserId))]

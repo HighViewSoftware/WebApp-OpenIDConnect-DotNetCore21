@@ -51,6 +51,26 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseMulti2" data-parent="#exampleAccordion">
+                        <i class="fa fa-fw fa-share"></i>
+                        <span class="nav-link-text">@Localizer["Share"]</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseMulti2">
+                        <li>
+                            <a asp-controller="Tenant" asp-action="Switch">
+                                <i class="fa fa-fw fa-share"></i>
+                                @Localizer["Switch to organization"]
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Tenant" asp-action="Users">
+                                <i class="fa fa-fw fa-group"></i>
+                                Users
+                            </a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <ul class="navbar-nav sidenav-toggler">
                 <li class="nav-item">

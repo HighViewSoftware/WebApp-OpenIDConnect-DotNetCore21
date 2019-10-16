@@ -12,5 +12,7 @@ namespace BopodaMVP.Data
         }
 
         public DbSet<MVPUser> Users { get; set; }
+        public DbSet<Organization> Organizations { get; set; }
+        public DbSet<OrganizationUserRelationship> OrganizationUserRelationships { get; set; }
     }
 }

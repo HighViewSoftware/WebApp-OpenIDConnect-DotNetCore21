@@ -3,14 +3,16 @@ using BopodaMVP.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BopodaMVP.Migrations
 {
     [DbContext(typeof(MVPDbContext))]
-    partial class MVPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191016082401_AddOrganization")]
+    partial class AddOrganization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
